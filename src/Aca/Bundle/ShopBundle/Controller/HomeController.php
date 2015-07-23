@@ -11,22 +11,14 @@ class HomeController extends Controller
 {
     public function indexAction()
     {
+
+        $db = $this->get('aca.db');
+
         $session = $this->get('session');
 
         $loggedIn = $session->get('logged_in');
         $name = $session->get('name');
         $errorMessage = $session->get('error_message');
-
-
-//        $loggedIn = (isset($_SESSION['logged_in'])) ? $_SESSION['logged_in'] : 0;
-//
-//        if($loggedIn == 1 ){
-//            $name = $_SESSION['name'];
-//        } else {
-//            $name = null;
-//        }
-        //$name = (isset($_SESSION['name']) ? $_SESSION['name'] : null ;
-
 
         return $this->render(
             'AcaShopBundle:Home:index.html.twig',
@@ -54,7 +46,7 @@ class HomeController extends Controller
         $query= 'SELECT * FROM aca_user WHERE username = "'.$username.'" AND password="'.$password.'"';
 //        $query = "SELECT * FROM aca_user WHERE username = $username AND password = $password";
 
-        $db = new DBCommon();
+        $db = $this->get('aca.db');
         $db->setQuery($query);
         $user = $db->loadObject();
 
@@ -82,5 +74,7 @@ class HomeController extends Controller
 
         return new RedirectResponse('/');
     }
+
+
 
 }

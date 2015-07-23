@@ -1,0 +1,48 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+    {% if products is not empty %}
+
+
+        <table class="table table-striped" style="width:100%;">
+        {% for product in products %}
+           <tr>
+
+                <td>
+                    <img class="media-object" src="{{ product.image }}" width="100px"/>
+
+                </td>
+                <td>
+                    <h3>{{ product.name }}</h3>
+
+                    <p>{{ product.description }}</p>
+                </td>
+               <td width="200px">
+                   <br/>
+                   <h5>Price: ${{ product.price }}</h5>
+                   <h4>Add to cart</h4>
+                   <form name="addToCart" action="/add_cart" method="post">
+                       <input type="text" name="quantity" size="11px" value="1"/>
+                       <br/><br/>
+                       <input type="hidden" name="product_id" value="{{ product.product_id }}"/>
+                       <input type="submit" value="Add To Cart"/>
+                   </form>
+
+               </td>
+
+
+           </tr>
+
+        {% endfor %}
+
+
+        </table>
+
+
+    {% else %}
+
+        <h4>No products to display</h4>
+
+    {% endif %}
+
+{% endblock %}
