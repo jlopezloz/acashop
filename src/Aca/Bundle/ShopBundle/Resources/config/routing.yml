@@ -18,3 +18,19 @@ aca_shop_products:
 aca_shop_addcart:
     path:     /add_cart
     defaults: { _controller: AcaShopBundle:Cart:add }
+
+aca_shop_cart:
+    path:     /cart
+    defaults: { _controller: AcaShopBundle:Cart:display }
+
+aca_shop_remove:
+    path:     /remove_cart_item
+    defaults: { _controller: AcaShopBundle:Cart:remove }
+
+aca_shop_update:
+    path:     /update_cart
+    defaults: { _controller: AcaShopBundle:Cart:update }
+
+aca_shop_delete:
+    path:     /delete_cart_item
+    defaults: { _controller: AcaShopBundle:Cart:delete }

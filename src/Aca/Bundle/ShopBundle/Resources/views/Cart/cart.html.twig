@@ -1,0 +1,76 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+
+    {% if products is not empty %}
+        <h2 style="text-align: center;">Update Cart</h4>
+        <table class="table table-striped" style="width:100%;">
+            <div>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Product Details</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            </div>
+
+            <tbody>
+
+            {% for product in products %}
+        <tr>
+
+            <td>
+                <img class="media-object" src="{{ product.image }}" width="100px"/>
+
+            </td>
+            <td>
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.description }}</p>
+
+            </td>
+            <td width="200px">
+                <h5>Price: ${{ product.price | number_format(2) }}</h5>
+                <div>Quantity: <!--{{ product.quantity | number_format(2) }}--></div>
+                <div><strong>Total:${{ product.total | number_format(2) }}</strong></div>
+            </td>
+            <td>
+                <form name="removeItemFromCart" action="/remove_cart_item" method="post">
+                    <input type="hidden" name="product_id" value="{{ product.product_id }}">
+                    <button class="btn btn-danger">Remove Item</button>
+                </form>
+                <form name="updateQuantity" action="/update_cart" method="post">
+                    <input type="hidden" name="product_id" value="{{ product.product_id }}"/>
+                    <input type="text" name="quantity" size="3" value="{{ product.quantity }}">
+                    <button class="btn btn-primary">Update Quantity</button>
+                </form>
+            </td>
+            <td>
+                <form name="deleteFromCart" action="/delete_cart_item" method="post">
+                    <input type="hidden" name="product_id" value="{{ product.product_id }}"/>
+                    <button class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </form>
+            </td>
+
+
+        </tr>
+
+    {% endfor %}
+            </tbody>
+        </table>
+
+       <div>
+            asdfasdf
+        </div>
+        <h2>Grand Total: ${{ grandTotal | number_format(2) }}</h2>
+
+
+    {% else %}
+
+        <h1>No Items in your Shopping Cart!</h1>
+
+    {% endif %}
+
+
+{% endblock %}
