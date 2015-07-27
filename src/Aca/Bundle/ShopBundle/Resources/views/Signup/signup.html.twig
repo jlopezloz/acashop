@@ -1,0 +1,32 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+    <div class="container">
+        <h3 style="text-align: center;">Sign Up For Shoppard</h3>
+        <p style="text-align: center">Welcome to Shoppard, the fastest place to buy.</p>
+        <p style="text-align: center">Create your account so you can start enjoying it.</p>
+
+        <form name="signUp" action="/sign_on" method="post" >
+            <div class="form-group">
+                <label for="exampleInputEmail1">First Name</label>
+                <input type="email" class="form-control" name="firstName" placeholder="ex. Clark">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputEmail1">Last Name</label>
+                <input type="email" class="form-control" name="lastName" placeholder="ex. Kent">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputEmail1">Email address</label>
+                <input type="email" class="form-control" name="email" placeholder="ex. theman@superman.com">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">Password</label>
+                <input type="password" class="form-control" name="password" placeholder="Password">
+            </div>
+            <div class="col-md-offset-10" style="padding-left: 46px">
+                <button type="submit" class="btn btn-success">Submit</button>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

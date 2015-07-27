@@ -3,7 +3,7 @@
 {% block body %}
 
     {% if products is not empty %}
-        <h2 style="text-align: center;">Update Cart</h4>
+        <h2 style="text-align: center;">Your Shopping Cart</h2>
         <table class="table table-striped" style="width:100%;">
             <div>
             <thead>
@@ -60,10 +60,23 @@
             </tbody>
         </table>
 
-       <div>
-            asdfasdf
-        </div>
-        <h2>Grand Total: ${{ grandTotal | number_format(2) }}</h2>
+       <div class="container-fluid">
+           <div class="col-md-6">
+               <h2>Grand Total: ${{ grandTotal | number_format(2) }}</h2>
+           </div>
+           <div class="col-md-6" style="margin-top: 20px; padding-left:410px">
+               <form name="checkout" action="#" method="post" style="display: inline-block">
+                   <input type="hidden" name="cart_info" value="x"/>
+                   <button class="btn btn-success">Check out</button>
+               </form>
+               <form name="continueShopping" action="/products" method="post" style="display: inline-block">
+                   <button class="btn btn-success">Continue Shopping</button>
+               </form>
+
+           </div>
+
+       </div>
+
 
 
     {% else %}

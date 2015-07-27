@@ -34,3 +34,11 @@ aca_shop_update:
 aca_shop_delete:
     path:     /delete_cart_item
     defaults: { _controller: AcaShopBundle:Cart:delete }
+
+aca_shop_signup:
+    path:     /sign_up
+    defaults: { _controller: AcaShopBundle:Signup:sign }
+
+aca_shop_signon:
+    path:     /sign_on
+    defaults: { _controller: AcaShopBundle:Signup:proceed }
