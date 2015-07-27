@@ -21,6 +21,15 @@ class SignupController extends Controller
 
     public function proceedAction()
     {
-        
+        $db = $this->get('aca.db');
+        $session = $this->get('session');
+
+        $email = $_POST['email'];
+        $fname = $_POST['firstName'];
+        $lname = $_POST['lastName'];
+        $password = $_POST['password'];
+
+        //Here is where a new object would be created by simply adding the above-mentioned variables
+
     }
 }
