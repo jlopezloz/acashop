@@ -95,7 +95,7 @@ class DBCommon
     /**
      * Get one record from the database
      *
-     * @return null|stdClass
+     * @return null|\stdClass
      */
     public function loadObject()
     {

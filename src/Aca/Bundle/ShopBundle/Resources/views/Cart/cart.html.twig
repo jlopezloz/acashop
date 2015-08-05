@@ -1,5 +1,15 @@
 {% extends "::base.html.twig" %}
 
+
+{#{% block nav %}#}
+    {#{% if loggedIn == 0 %}#}
+
+    {#{% else %}#}
+        {#<li role="navigation"><a href="/logout">Account Settings</a></li>#}
+    {#{% endif %}#}
+
+{#{% endblock %}#}
+
 {% block body %}
 
     {% if products is not empty %}
@@ -65,7 +75,7 @@
                <h2>Grand Total: ${{ grandTotal | number_format(2) }}</h2>
            </div>
            <div class="col-md-6" style="margin-top: 20px; padding-left:410px">
-               <form name="checkout" action="#" method="post" style="display: inline-block">
+               <form name="checkout" action="/shipping_address" method="post" style="display: inline-block">
                    <input type="hidden" name="cart_info" value="x"/>
                    <button class="btn btn-success">Check out</button>
                </form>
@@ -76,7 +86,6 @@
            </div>
 
        </div>
-
 
 
     {% else %}

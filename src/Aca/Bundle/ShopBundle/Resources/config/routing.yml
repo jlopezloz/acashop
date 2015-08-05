@@ -42,3 +42,15 @@ aca_shop_signup:
 aca_shop_signon:
     path:     /sign_on
     defaults: { _controller: AcaShopBundle:Signup:proceed }
+
+aca_shipping_address:
+    path: /shipping_address
+    defaults: { _controller: AcaShopBundle:Cart:shippingAddress }
+
+aca_place_order:
+    path: /place_order
+    defaults: { _controller: AcaShopBundle:Order:place }
+
+aca_place_receipt:
+    path: /receipt
+    defaults: { _controller: AcaShopBundle:Receipt:show }

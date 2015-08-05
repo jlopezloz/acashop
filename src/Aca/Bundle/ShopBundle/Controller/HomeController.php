@@ -11,7 +11,9 @@ class HomeController extends Controller
 {
     public function indexAction()
     {
-
+        /**
+         * @var DBCommon $db
+         */
         $db = $this->get('aca.db');
 
         $session = $this->get('session');
@@ -36,10 +38,17 @@ class HomeController extends Controller
     {
         $session = $this->get('session');
         //acquire user input
-        $username=$_POST['username'];
-//        echo '$username=' . $username . '<br/>';
-        $password =$_POST['password'];
-//        echo '$password=' . $password . '<br/>';
+        if(isset($_POST))
+        {
+            $username=$_POST['username'];
+//          echo '$username=' . $username . '<br/>';
+            $password =$_POST['password'];
+//          echo '$password=' . $password . '<br/>';
+        } else {
+
+        }
+
+
 
 
         //check username and password
@@ -50,14 +59,16 @@ class HomeController extends Controller
         $db->setQuery($query);
         $user = $db->loadObject();
 
+
 //        session_start(); symfony does it for you
 
         if(empty($user)) {
             $session->set('logged_in',0);
-            $session->set('error_message', 'Login failed, please try again');
+            $session->set('error_message', 'Please choose another name');
         } else {
             $session->set('logged_in', 1);
             $session->set('name', $user->name);
+            $session->set('user_id', $user->user_id);
         }
 
         //redirect user back to the homepage

@@ -1,10 +1,14 @@
 <?php
 namespace Aca\Bundle\ShopBundle\Controller;
 
+use Aca\Bundle\ShopBundle\Db\DBCommon;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Aca\Bundle\ShopBundle\Shop\Cart;
+use Aca\Bundle\ShopBundle\Shop\Product;
 
 class CartController extends Controller
 {
@@ -53,26 +57,29 @@ class CartController extends Controller
     public function displayAction()
     {
         $db = $this->get('aca.db');
+
+        /** @var Product $product; */
+        $product = $this->get('aca.product');
+        /** @var Cart $cart; */
+        $cart = $this->get('aca.cart');
+
         $session = $this->get('session');
+        $loggedIn = $session->get('logged_in');
 
-        $cart = $session->get('cart'); //flaw if there are no items in the cart
-        $product_id =[];
-        foreach($cart as $cartitem)
-        {
-            $product_id[] = $cartitem['product_id'];
-        }
+        $cartItems = $session->get('cart'); //flaw if there are no items in the cart
 
-        $list = implode(',',$product_id);
-        $query = "SELECT * FROM aca_product WHERE product_id IN ($list)";
-        $db->setQuery($query);
-        $shoppingcart = $db->loadObjectList();
+
+        $product_id = $cart->getProductIds();
+        $shoppingCart = $product->getAllProducts($product_id);
+
+
 
         $prodQty = [];
         $GT = 0.00;
 
-        foreach($shoppingcart as $item)
+        foreach($shoppingCart as $item)
         {
-            foreach($cart as $cartitem)
+            foreach($cartItems as $cartitem)
             {
                 if($cartitem['product_id'] == $item->product_id)
                 {
@@ -91,7 +98,8 @@ class CartController extends Controller
         return $this->render('AcaShopBundle:Cart:cart.html.twig',
             array(
                 'products' => $prodQty,
-                'grandTotal' => $GT
+                'grandTotal' => $GT,
+                'loggedIn' =>$loggedIn
             )
         );
     }
@@ -129,21 +137,19 @@ class CartController extends Controller
         return new RedirectResponse('/cart');
     }
 
+    /**
+     * @return RedirectResponse
+     */
     public function updateAction()
     {
         $product_id = $_POST['product_id'];
         $updated_quantity = $_POST['quantity'];
 
-        $session = $this->get('session');
-        $cart = $session->get('cart');
-
-        foreach($cart as $index => $cartItem) {
-            if($cartItem['product_id'] == $product_id) {
-                $cart[$index]['quantity'] = $updated_quantity;
-            }
-        }
-
-        $session->set('cart', $cart);
+        /**
+         * @var Cart $cart
+         */
+        $cart = $this->get('aca.cart');
+        $cart->update($product_id, $updated_quantity);
 
         return new RedirectResponse('/cart');
 
@@ -151,19 +157,79 @@ class CartController extends Controller
 
     public function deleteAction()
     {
-        $product_id = $_POST['product_id'];
-        $session = $this->get('session');
-        $cart = $session->get('cart');
+        $product_Id = $_POST['product_id'];
 
-        foreach($cart as $index => $cartItem) {
-            if($cartItem['product_id'] == $product_id) {
-                unset($cart[$index]);
-            }
-        }
-        $session->set('cart', $cart);
-
+        /** @var Cart $cart */
+        $cart = $this->get('aca.cart');
+        $cart->delete($product_Id);
         return new RedirectResponse('/cart');
+
+
     }
+
+    public function shippingAddressAction()
+    {
+        /** @var Session $session */
+        $session = $this->get('session');
+        /** @var DBCommon $db */
+        $db = $this->get('aca.db');
+        /** @var int $userId Logged in user identifier */
+        $userId = $session->get('user_id');
+
+
+        // Get the shipping_address_id and billing_address_id from the user table
+
+        $query = '
+        select
+            shipping_address_id,
+            billing_address_id
+        from
+            aca_user
+        where
+            user_id = "'.$userId.'"
+            ';
+
+        $db->setQuery($query);
+        $shippingIds = $db->loadObject();
+        $shippingAddressId = $shippingIds->shipping_address_id;
+        $billingAddressId = $shippingIds->billing_address_id;
+
+
+        // Get shipping and billing address
+        $shippingQuery = '
+        select
+            *
+        from
+            aca_order_address
+        where
+            id = "'.$shippingAddressId.'"'
+        ;
+        $db->setQuery($shippingQuery);
+        $shippingAddress = $db->loadObject();
+        $billingQuery = '
+        select
+            *
+        from
+            aca_order_address
+        where
+            id ="'.$billingAddressId.'"
+            ';
+        $db->setQuery($billingQuery);
+        $billingAddress = $db->loadObject();
+
+
+
+
+        return $this->render('AcaShopBundle:Shipping:address.html.twig',
+            array(
+                'shipping' => $shippingAddress,
+                'billing' => $billingAddress
+            )
+        );
+
+
+    }
+
 
 }
 

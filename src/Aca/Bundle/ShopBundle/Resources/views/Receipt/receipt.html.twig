@@ -1,0 +1,86 @@
+{% extends "::base.html.twig" %}
+
+{% block nav %}
+    {% if loggedIn == 0 %}
+
+    {% else %}
+        <li role="navigation"><a href="/logout">Account Settings</a></li>
+    {% endif %}
+
+{% endblock %}
+
+{% block body %}
+
+    <h3>Thank you for your Order</h3>
+    <h5>Order ID = {{ orderId }}</h5>
+    <br/>
+    <div class="container-fluid">
+        <table style="width: 150%">
+            <tr>
+                <td>
+                    <h4>Billing</h4>
+                    {{ billing.street }}<br/>
+                    {{ billing.city }}, {{ billing.state }} - {{ billing.zip }}
+                </td>
+                <td>
+                    <h4>Shipping</h4>
+                    {{ shipping.street }}<br/>
+                    {{ shipping.city }}, {{ shipping.state }} - {{ shipping.zip }}
+                </td>
+            </tr>
+        </table>
+    </div>
+    <br/>
+    <h4>Order Products</h4>
+
+    {% set orderTotal = 0 %}
+
+    {% if products is not empty %}
+        <div class="container-fluid">
+            <table class="table table-striped" style="width:100%;">
+                <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Product Details</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for product in products %}
+
+                    {%  set orderTotal = orderTotal + product.price %}
+
+                   <tr>
+
+                        <td>
+                            <img class="media-object" src="{{ product.image }}" width="100px"/>
+                        </td>
+                        <td>
+
+
+                            <h3>{{ product.name }}</h3>
+
+                            <p>{{ product.description }}</p>
+                        </td>
+                       <td width="200px">
+                           <h5>${{ product.price }}</h5>
+                       </td>
+                       <td>
+                           <h5>{{ product.quantity }}</h5>
+                       </td>
+
+                   </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+    {% endif %}
+    </div>
+
+    <div style="float:right; color:green; font-size:2em;">
+        Order Total: {{ orderTotal | number_format(2)}}
+    </div>
+
+
+{% endblock %}
