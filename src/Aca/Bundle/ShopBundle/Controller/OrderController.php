@@ -24,7 +24,9 @@ class OrderController extends Controller
         $db = $this->get('aca.db');
         /** @var Session $session */
         $session = $this->get('session');
-        $userId = $session->get('user_id');
+        $userId = $session->get('user_id'); //is there a user ID on the session?
+
+
         // Create an order record
         $query = 'insert into aca_order(user_id) values(' . $userId . ')';
         $db->setQuery($query);

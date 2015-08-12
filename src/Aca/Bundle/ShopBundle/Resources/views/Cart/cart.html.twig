@@ -12,6 +12,10 @@
 
 {% block body %}
 
+    {% if errorMessage is not empty %}
+        {{ errorMessage }}
+    {% endif %}
+
     {% if products is not empty %}
         <h2 style="text-align: center;">Your Shopping Cart</h2>
         <table class="table table-striped" style="width:100%;">

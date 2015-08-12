@@ -5,6 +5,7 @@ namespace Aca\Bundle\ShopBundle\Controller;
 use Aca\Bundle\ShopBundle\Db\DBCommon;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Aca\Bundle\ShopBundle\Shop\OrderComplete;
 
 class ReceiptController extends Controller
 {
@@ -12,53 +13,26 @@ class ReceiptController extends Controller
     public function showAction()
     {
         $session = $this->get('session');
-        /**
-         * @var DBCommon db
-         */
-        $db = $this->get('aca.db');
+
+        $session->remove('cart');
+
         $loggedIn = $session->get('logged_in');
+
+
+
+        /**
+         * @var OrderComplete $order
+         */
+        $order = $this->get('aca.order');
 
         $orderId = $session->get('completed_order_id');
 
-        $shippingQuery ='
-        SELECT
-        *
-        FROM
-        aca_order_address
-        WHERE
-        order_id = "'.$orderId.'"
-        ';
+        $products = $order->getProducts();
 
-        $db->setQuery($shippingQuery);
-        $rows = $db->loadObjectList();
+        $billingAddress = $order->getBillingAddress();
 
-        $billingAddress = null;
-        $shippingAddress = null;
+        $shippingAddress = $order->getShippingAddress();
 
-        foreach ($rows as $row) {
-            if($row->type == 'billing') {
-                $billingAddress = $row;
-            } else {
-                $shippingAddress = $row;
-            }
-        }
-
-        $query = '
-        select
-            op.price,
-            op.quantity,
-            p.name,
-            p.description,
-            p.image
-        from
-            aca_order_product op
-            join aca_product p on (p.product_id = op.product_id)
-        where
-            order_id = "'.$orderId.'"
-        ';
-
-        $db->setQuery($query);
-        $products = $db->loadObjectList();
 
         return $this->render('AcaShopBundle:Receipt:receipt.html.twig',
             array(

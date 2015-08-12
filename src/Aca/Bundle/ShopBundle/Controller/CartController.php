@@ -9,97 +9,67 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Aca\Bundle\ShopBundle\Shop\Cart;
 use Aca\Bundle\ShopBundle\Shop\Product;
+use Aca\Bundle\ShopBundle\Shop\User;
 
 class CartController extends Controller
 {
+    /**
+     * Adds an item to the cart and registers it within the session
+     * @return RedirectResponse /cart
+     */
     public function addAction()
     {
-        $session = $this->get('session');
-        $cart = $session->get('cart');
+        /**
+         * @var Cart $cart;
+         */
+        $cart = $this->get('aca.cart');
 
         $product_id = $_POST['product_id'];
         $quantity = $_POST['quantity'];
 
-        /**
-         *Add to the cart if its empty.
-         */
-           if(empty($cart)) {
-            $cart[] = array(
-                'product_id' => $product_id,
-                'quantity' => $quantity
-            );
-           } else {
-               $existingItem = false;   //boolean that was artificially created
-
-               foreach($cart as &$cartItem) {
-
-                   if($cartItem['product_id'] == $product_id) {
-
-                       $existingItem = true;
-
-                       $cartItem['quantity'] += $quantity;
-                   }
-               };
-
-               if($existingItem==false){
-                   $cart[] = array(
-                       'product_id' => $product_id,
-                       'quantity' => $quantity
-                   );
-               }
-           }
-
-        $session->set('cart',$cart);
+        $cart->addItem($product_id, $quantity);
 
         return new RedirectResponse('/cart');
     }
 
+    /**
+     * Shows the items that are in the sessions/user's cart.
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function displayAction()
     {
-        $db = $this->get('aca.db');
-
-        /** @var Product $product; */
-        $product = $this->get('aca.product');
-        /** @var Cart $cart; */
+        /**
+         * @var Cart $cart
+         */
         $cart = $this->get('aca.cart');
 
-        $session = $this->get('session');
-        $loggedIn = $session->get('logged_in');
-
-        $cartItems = $session->get('cart'); //flaw if there are no items in the cart
-
-
-        $product_id = $cart->getProductIds();
-        $shoppingCart = $product->getAllProducts($product_id);
+        /**
+         * @var User $user;
+         */
+        $user = $this->get('aca.user');
+        $loggedIn = $user->isLoggedIn();
 
 
+        $UserSelectedProducts = null;
+        $grandTotal = null;
+        $errorMessage = null;
 
-        $prodQty = [];
-        $GT = 0.00;
+        try{
+            $UserSelectedProducts = $cart->getCartProducts();
 
-        foreach($shoppingCart as $item)
-        {
-            foreach($cartItems as $cartitem)
-            {
-                if($cartitem['product_id'] == $item->product_id)
-                {
-                    $item->quantity = $cartitem['quantity'];
+            $grandTotal = $cart->getGrandTotal();
 
-                    $item->total = $cartitem['quantity'] * $item->price;
-                    $GT += $item->total;
-
-                    $prodQty[] = $item;
-
-                }
-
-            }
-
+        } catch (\Exception $e) {
+            $errorMessage = $e->getMessage();
         }
+
+        //fix the error message here
         return $this->render('AcaShopBundle:Cart:cart.html.twig',
             array(
-                'products' => $prodQty,
-                'grandTotal' => $GT,
-                'loggedIn' =>$loggedIn
+                'products' => $UserSelectedProducts,
+                'grandTotal' => $grandTotal,
+                'loggedIn' =>$loggedIn,
+                'errorMessage' =>$errorMessage
             )
         );
     }
@@ -112,32 +82,20 @@ class CartController extends Controller
     public function removeAction()
     {
         $product_id = $_POST['product_id'];
+        /**
+         * @var Cart $cart;
+         */
+        $cart = $this->get('aca.cart');
 
-        $session = $this->get('session');
-        $cart = $session->get('cart');
-
-        foreach($cart as $index => $cartitem)
-        {
-
-            if($cartitem['product_id'] == $product_id)
-            {
-                if($cartitem['quantity'] == 1) {
-                    unset($cart[$index]);
-                } else {
-                    $int=(int)$cart[$index]['quantity'];
-                    $int -= 1;
-                    $cart[$index]['quantity'] = $int;
-                }
-
-            }
-        }
-
-        $session->set('cart', $cart);
+        $cart->remove($product_id);
 
         return new RedirectResponse('/cart');
+
+
     }
 
     /**
+     * Updates the item quantity in the cart
      * @return RedirectResponse
      */
     public function updateAction()
@@ -155,6 +113,11 @@ class CartController extends Controller
 
     }
 
+    /**
+     * Completely deletes the item from the cart, regardless of the quantity.
+     * @return RedirectResponse
+     * @throws \Exception
+     */
     public function deleteAction()
     {
         $product_Id = $_POST['product_id'];
@@ -176,7 +139,10 @@ class CartController extends Controller
         /** @var int $userId Logged in user identifier */
         $userId = $session->get('user_id');
 
-
+        if(empty($userId)){
+            $session->set('error_message', 'Please create an account before proceeding to check-out');
+            return new RedirectResponse('/');  //probably better to direct the user to the sign-up page.
+        }
         // Get the shipping_address_id and billing_address_id from the user table
 
         $query = '
