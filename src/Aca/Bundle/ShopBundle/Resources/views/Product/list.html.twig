@@ -1,12 +1,12 @@
 {% extends "::base.html.twig" %}
 
-{#{% block nav %}#}
-    {#{% if loggedIn == 0 %}#}
-    {#{% else %}#}
-        {#<li role="navigation"><a href="/logout">Account Settings</a></li>#}
-    {#{% endif %}#}
+{% block nav %}
+    {% if loggedIn == 0 %}
+    {% else %}
+        <li role="navigation"><a href="/logout">Account Settings</a></li>
+    {% endif %}
 
-{#{% endblock %}#}
+{% endblock %}
 
 {% block body %}
     {% if products is not empty %}
